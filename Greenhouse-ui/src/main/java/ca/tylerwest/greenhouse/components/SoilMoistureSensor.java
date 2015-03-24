@@ -10,5 +10,13 @@ package ca.tylerwest.greenhouse.components;
  * @author twest
  */
 public class SoilMoistureSensor {
+    private final int GPIO;
+
+    public SoilMoistureSensor(int GPIO) {
+        this.GPIO = GPIO;
+    }
     
+    public double getSoilMoistureLevel() {
+        return 0.0;
+    }
 }

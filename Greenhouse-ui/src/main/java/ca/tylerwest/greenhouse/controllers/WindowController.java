@@ -5,10 +5,25 @@
  */
 package ca.tylerwest.greenhouse.controllers;
 
+import ca.tylerwest.greenhouse.components.WindowMotor;
+import java.util.List;
+
 /**
  *
  * @author twest
  */
 public class WindowController {
+    private List<WindowMotor> windowMotors;
+
+    public WindowController(List<WindowMotor> windowMotors) {
+        this.windowMotors = windowMotors;
+    }
     
+    public void raiseWindows() {
+        
+    }
+    
+    public void lowerWindows() {
+        
+    }
 }
