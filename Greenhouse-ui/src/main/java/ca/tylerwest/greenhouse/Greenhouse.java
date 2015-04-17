@@ -6,9 +6,12 @@
 package ca.tylerwest.greenhouse;
 
 import ca.tylerwest.greenhouse.components.TemperatureHumiditySensor;
+import ca.tylerwest.greenhouse.components.WindowMotor;
 import ca.tylerwest.greenhouse.controllers.WindowController;
 import ca.tylerwest.greenhouse.controllers.ZoneController;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,8 +55,22 @@ public class Greenhouse {
         }
     }
     
-    private void createSensors() {
+    private void createComponents() {
+        temperatureHumiditySensor = new TemperatureHumiditySensor(properties.getProperty("Global.TemperatureHumiditySensor.ID"), Integer.valueOf(properties.getProperty("Global.TemperatureHumiditySensor.GPIO")));
         
+        List<WindowMotor> windowMotors = new ArrayList<WindowMotor>();
+        
+        int i = 1;
+        String windowMotorID = properties.getProperty(String.format("Global.WindowMotor%s.ID", i));
+        while (windowMotorID != null)
+        {
+            windowMotors.add(new WindowMotor(Integer.valueOf(properties.getProperty(String.format("Global.WindowMotor%s.GPIO", i)))));
+            
+            i++;
+            windowMotorID = properties.getProperty(String.format("Global.WindowMotor%s.ID", i));
+        }
+        
+        windowController = new WindowController(windowMotors);
     }
     
     private void startTimedServices() {
@@ -65,7 +82,7 @@ public class Greenhouse {
         if (!initialized)
         {
             loadProperties();
-            createSensors();
+            createComponents();
             startTimedServices();
             
             initialized = true;
