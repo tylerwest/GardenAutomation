@@ -4,8 +4,8 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <property name="context-root" value="greenhouse"/>
         <property name="java-output-path" value="/greenhouse/target/classes"/>
         <property name="component.exclusion.patterns" value="WEB-INF/classes/VAADIN/gwt-unitCache/**,WEB-INF/classes/VAADIN/widgetsets/WEB-INF/**"/>
+        <property name="context-root" value="greenhouse"/>
     </wb-module>
 </project-modules>

@@ -49,7 +49,7 @@ public class GreenhouseUI extends UI {
     }
 
     @WebServlet(urlPatterns = "/*", name = "GreenhouseUIServlet", asyncSupported = true)
-    @VaadinServletConfiguration(ui = GreenhouseUI.class, productionMode = false)
+    @VaadinServletConfiguration(ui = GreenhouseUI.class, productionMode = true)
     public static class GreenhouseUIServlet extends VaadinServlet {
     }
 }
