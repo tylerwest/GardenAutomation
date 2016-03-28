@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<authentication>
+<!-- 
+Create user and role entries to define users and the system roles.
+You may then assign the user access levels via the 'access' tag.
+-->
+
+<!-- 
+    <user name="admin" password="password">
+        <access name="admin"/>
+        <access name="user"/>
+    </user>
+    <user name="user" password="password">
+        <access name="user"/>
+    </user>
+    <role name="admin"/>
+    <role name="user"/>
+-->
+</authentication>

@@ -1,24 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ca.tylerwest.greenhouse.components;
 
-/**
- *
- * @author twest
- */
-public class WindowMotor {
-    private final int GPIO;
+public class WindowMotor extends AbstractGPIOComponent {
 
+    private final String ID;
+    
     public enum Direction {
         FORWARD, BACKWARD;
     }
     
-    public WindowMotor(int GPIO) {
-        this.GPIO = GPIO;
+    public WindowMotor(String ID, int GPIO) {
+        super(GPIO);
+    	this.ID = ID;
     }
+    
+    public final String getID() {
+		return ID;
+	}
     
     public void on(Direction direction) {
         

@@ -1,55 +1,45 @@
 package ca.tylerwest.greenhouse.web;
 
-import java.util.Map.Entry;
-
 import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
-import ca.tylerwest.greenhouse.Greenhouse;
+import ca.tylerwest.greenhouse.web.auth.AccessControl;
+import ca.tylerwest.greenhouse.web.auth.GreenhouseAccessControl;
+import ca.tylerwest.greenhouse.web.views.MainScreen;
 
-/**
- * This UI is the application entry point. A UI may either represent a browser window 
- * (or tab) or some part of a html page where a Vaadin application is embedded.
- * <p>
- * The UI is initialized using {@link #init(VaadinRequest)}. This method is intended to be 
- * overridden to add component to the user interface and initialize non-component functionality.
- */
+@SuppressWarnings("serial")
 @Theme("greenhouse")
 @Widgetset("ca.tylerwest.greenhouse.GreenhouseWidgetset")
 public class GreenhouseUI extends UI {
+	
+	private AccessControl accessControl = new GreenhouseAccessControl();
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
-        setContent(layout);
-
-        Button button = new Button("Click Me");
-        button.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                for (Entry<Object, Object> entry : Greenhouse.getInstance().getProperties().entrySet()) {
-                    layout.addComponent(new Label(entry.getKey() + " : " + entry.getValue()));
-                }
-            }
-        });
-        layout.addComponent(button);
-
+    	Responsive.makeResponsive(this);
+        setLocale(vaadinRequest.getLocale());
+        getPage().setTitle("Greenhouse");
+        setContent(new MainScreen());
         System.out.println("----------------------UI INIT");
+    }
+    
+    public static GreenhouseUI get() {
+        return (GreenhouseUI) UI.getCurrent();
+    }
+
+    public AccessControl getAccessControl() {
+        return accessControl;
     }
 
     @WebServlet(urlPatterns = "/*", name = "GreenhouseUIServlet", asyncSupported = true)
-    @VaadinServletConfiguration(ui = GreenhouseUI.class, productionMode = true)
+    @VaadinServletConfiguration(ui = GreenhouseUI.class, productionMode = false)
     public static class GreenhouseUIServlet extends VaadinServlet {
     }
 }

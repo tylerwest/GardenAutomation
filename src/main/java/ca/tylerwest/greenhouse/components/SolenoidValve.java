@@ -1,33 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ca.tylerwest.greenhouse.components;
 
-/**
- *
- * @author twest
- */
-public class SolenoidValve {
-    private final int GPIO;
+import ca.tylerwest.greenhouse.listeners.GPIOTaskListener;
+
+public class SolenoidValve extends AbstractGPIOComponent {
 
     public enum State {
         OPEN, CLOSED;
     }
     
-    private State state;
+    private State state = State.CLOSED;
     
     public SolenoidValve(int GPIO) {
-        this.GPIO = GPIO;
+        super(GPIO);
     }
     
-    public void open() {
+    public void open(GPIOTaskListener listener) {
         state = State.OPEN;
+        listener.onTaskStarted();
+        listener.onTaskCompleted();
     }
     
-    public void close() {
+    public void close(GPIOTaskListener listener) {
         state = State.CLOSED;
+        listener.onTaskStarted();
+        listener.onTaskCompleted();
     }
     
     public State getState() {
