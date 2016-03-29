@@ -7,10 +7,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+
 import ca.tylerwest.greenhouse.components.SoilMoistureSensor;
 import ca.tylerwest.greenhouse.components.SolenoidValve;
 import ca.tylerwest.greenhouse.components.TemperatureHumiditySensor;
 import ca.tylerwest.greenhouse.components.WindowMotor;
+import ca.tylerwest.greenhouse.controllers.GreenhouseGpioController;
 import ca.tylerwest.greenhouse.controllers.WindowController;
 import ca.tylerwest.greenhouse.controllers.Zone;
 import ca.tylerwest.greenhouse.controllers.ZoneController;
@@ -27,6 +31,7 @@ public class Greenhouse {
 	private TemperatureHumiditySensor temperatureHumiditySensor;
 	private WindowController windowController;
 	private ZoneController zoneController;
+	private GreenhouseGpioController greenhouseGpioController;
 
 	private Greenhouse() {
 		initialized = false;
@@ -104,6 +109,8 @@ public class Greenhouse {
 		}
 
 		zoneController = new ZoneController(zones);
+		
+		greenhouseGpioController = new GreenhouseGpioController();
 	}
 
 	private void startTimedServices() {
@@ -151,6 +158,10 @@ public class Greenhouse {
 
 	public ZoneController getZoneController() {
 		return zoneController;
+	}
+	
+	public GreenhouseGpioController getGreenhouseGpioController() {
+		return greenhouseGpioController;
 	}
 
 	public Properties getProperties() {
