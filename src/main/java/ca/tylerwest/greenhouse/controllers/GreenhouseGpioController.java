@@ -7,8 +7,6 @@ import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
 import ca.tylerwest.greenhouse.Greenhouse;
@@ -38,7 +36,6 @@ public class GreenhouseGpioController {
 		if (pin == null)
 		{
 			pin = gpio.provisionDigitalOutputPin(RaspiPin.getPinByName(String.format("GPIO %s", pinNumber)));
-			pin.setShutdownOptions(true, PinState.LOW, PinPullResistance.PULL_DOWN);
 			outputPins.put(pinNumber, pin);
 		}
 		return pin;
@@ -50,7 +47,6 @@ public class GreenhouseGpioController {
 		if (pin == null)
 		{
 			pin = gpio.provisionDigitalInputPin(RaspiPin.getPinByName(String.format("GPIO %s", pinNumber)));
-			pin.setShutdownOptions(true, PinState.LOW, PinPullResistance.PULL_DOWN);
 			inputPins.put(pinNumber, pin);
 		}
 		return pin;

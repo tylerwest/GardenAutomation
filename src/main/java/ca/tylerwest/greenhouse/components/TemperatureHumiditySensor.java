@@ -56,6 +56,12 @@ public class TemperatureHumiditySensor extends AbstractGPIOComponent {
 	public void setMaximumHumidity(double maximumHumidity) {
 		this.maximumHumidity = maximumHumidity;
 	}
+
+	@Override
+	protected void provisionPin() {
+		// TODO Auto-generated method stub
+		
+	}
     
     
 }

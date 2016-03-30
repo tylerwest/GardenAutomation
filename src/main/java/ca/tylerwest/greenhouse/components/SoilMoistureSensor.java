@@ -9,4 +9,10 @@ public class SoilMoistureSensor extends AbstractGPIOComponent {
     public double getSoilMoistureLevel() {
         return 0.0;
     }
+
+	@Override
+	protected void provisionPin() {
+		// TODO Auto-generated method stub
+		
+	}
 }

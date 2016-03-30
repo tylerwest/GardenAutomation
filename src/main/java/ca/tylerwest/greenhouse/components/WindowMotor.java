@@ -24,4 +24,10 @@ public class WindowMotor extends AbstractGPIOComponent {
     public void off() {
         
     }
+
+	@Override
+	protected void provisionPin() {
+		// TODO Auto-generated method stub
+		
+	}
 }
