@@ -6,6 +6,11 @@ This project is being developed to fully automate my backyard greenhouse. Basic 
 ## Hardware
 - 6 x 12V solenoid valves
 - 6 x Capacitative soil moisture sensors (board design here: http://zerocharactersleft.blogspot.ca/2011/11/pcb-as-capacitive-soil-moisture-sensor.html)
+- 2 x 12V DC motors for the windows
+- 1 x L298N Dual H-bridge motor controller
+- 1 x DHT11 Temperature and humidity sensor
+- 1 x Raspberry Pi 2
+- 1 x Sainsmart 8-channel 5V / 12V relay board
 
 ## Requirements
 - Java 8
