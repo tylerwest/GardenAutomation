@@ -56,7 +56,7 @@ public class Greenhouse {
 
 	private void createComponents() {
 		greenhouseGpioController = new GreenhouseGpioController();
-		
+
 		temperatureHumiditySensor = new TemperatureHumiditySensor(
 				properties.getProperty("Global.TemperatureHumiditySensor.ID"),
 				Integer.valueOf(properties.getProperty("Global.TemperatureHumiditySensor.GPIO")));
@@ -66,15 +66,20 @@ public class Greenhouse {
 		int windowMotorNumber = 1;
 		String windowMotorID = properties.getProperty(String.format("Global.WindowMotor%s.ID", windowMotorNumber));
 		while (windowMotorID != null) {
-			windowMotors.add(new WindowMotor(windowMotorID, Integer
-					.valueOf(properties.getProperty(String.format("Global.WindowMotor%s.GPIO", windowMotorNumber)))));
+			Integer forwardGpio = Integer
+					.valueOf(properties.getProperty(String.format("Global.WindowMotor%s.Forward.GPIO", windowMotorNumber)));
+			Integer backwardGpio = Integer
+					.valueOf(properties.getProperty(String.format("Global.WindowMotor%s.Backward.GPIO", windowMotorNumber)));
+			WindowMotor motor = new WindowMotor(windowMotorID, forwardGpio, backwardGpio);
+			windowMotors.add(motor);
 
 			windowMotorNumber++;
 			windowMotorID = properties.getProperty(String.format("Global.WindowMotor%s.ID", windowMotorNumber));
 		}
 
 		windowController = new WindowController(windowMotors);
-		windowController.setActiveTimeSeconds(Double.valueOf(properties.getProperty("Global.WindowController.ActiveTimeSeconds")));
+		windowController.setActiveTimeSeconds(
+				Double.valueOf(properties.getProperty("Global.WindowController.ActiveTimeSeconds")));
 
 		List<Zone> zones = new ArrayList<Zone>();
 		int zoneNumber = 1;
@@ -127,20 +132,17 @@ public class Greenhouse {
 	public void shutdown() {
 		if (initialized) {
 			initialized = false;
-			
+
 			fireShutdownEvents();
 		}
 	}
-	
-	public void addTerminationListener(GreenhouseTerminationListener listener)
-	{
+
+	public void addTerminationListener(GreenhouseTerminationListener listener) {
 		terminationListeners.add(listener);
 	}
-	
-	private void fireShutdownEvents()
-	{
-		for (GreenhouseTerminationListener listener : terminationListeners)
-		{
+
+	private void fireShutdownEvents() {
+		for (GreenhouseTerminationListener listener : terminationListeners) {
 			listener.onGreenhouseTerminated();
 		}
 	}
@@ -156,7 +158,7 @@ public class Greenhouse {
 	public ZoneController getZoneController() {
 		return zoneController;
 	}
-	
+
 	public GreenhouseGpioController getGreenhouseGpioController() {
 		return greenhouseGpioController;
 	}

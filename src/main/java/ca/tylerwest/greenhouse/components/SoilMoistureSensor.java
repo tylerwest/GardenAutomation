@@ -11,7 +11,7 @@ public class SoilMoistureSensor extends AbstractGPIOComponent {
     }
 
 	@Override
-	protected void provisionPin() {
+	protected void provisionPins() {
 		// TODO Auto-generated method stub
 		
 	}

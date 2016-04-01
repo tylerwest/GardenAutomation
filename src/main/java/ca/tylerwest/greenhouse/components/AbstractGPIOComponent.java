@@ -1,16 +1,16 @@
 package ca.tylerwest.greenhouse.components;
 
 public abstract class AbstractGPIOComponent {
-	private int GPIO;
+	private int[] GPIO;
 	
-	public AbstractGPIOComponent(int GPIO) {
+	public AbstractGPIOComponent(int... GPIO) {
 		this.GPIO = GPIO;
-		provisionPin();
+		provisionPins();
 	}
 	
-	public final int getGPIO() {
+	public final int[] getGPIO() {
 		return GPIO;
 	}
 	
-	protected abstract void provisionPin();
+	protected abstract void provisionPins();
 }

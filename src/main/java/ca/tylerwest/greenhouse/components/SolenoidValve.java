@@ -30,11 +30,11 @@ public class SolenoidValve extends AbstractGPIOComponent {
      * 
      * On startup and shutdown the pin state should be set to high to turn off the relays.
      */
-    protected void provisionPin()
+    protected void provisionPins()
     {
-    	outputPin = Greenhouse.getInstance().getGreenhouseGpioController().getOutputPin(getGPIO());
+    	outputPin = Greenhouse.getInstance().getGreenhouseGpioController().getOutputPin(getGPIO()[0]);
     	outputPin.setState(PinState.HIGH);
-        outputPin.setShutdownOptions(true, PinState.HIGH, PinPullResistance.OFF);
+        outputPin.setShutdownOptions(true, PinState.HIGH, PinPullResistance.PULL_UP);
     }
     
     public void open(GPIOTaskListener listener) {
