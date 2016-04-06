@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import ca.tylerwest.greenhouse.components.MasterSwitch;
 import ca.tylerwest.greenhouse.components.SoilMoistureSensor;
 import ca.tylerwest.greenhouse.components.SolenoidValve;
 import ca.tylerwest.greenhouse.components.TemperatureHumiditySensor;
@@ -15,6 +16,7 @@ import ca.tylerwest.greenhouse.controllers.GreenhouseGpioController;
 import ca.tylerwest.greenhouse.controllers.WindowController;
 import ca.tylerwest.greenhouse.controllers.Zone;
 import ca.tylerwest.greenhouse.controllers.ZoneController;
+import ca.tylerwest.greenhouse.listeners.GPIOTaskListener;
 import ca.tylerwest.greenhouse.listeners.GreenhouseTerminationListener;
 
 public class Greenhouse {
@@ -29,6 +31,8 @@ public class Greenhouse {
 	private WindowController windowController;
 	private ZoneController zoneController;
 	private GreenhouseGpioController greenhouseGpioController;
+	
+	private MasterSwitch masterSwitch;
 
 	private Greenhouse() {
 		initialized = false;
@@ -56,6 +60,10 @@ public class Greenhouse {
 
 	private void createComponents() {
 		greenhouseGpioController = new GreenhouseGpioController();
+		
+		masterSwitch = new MasterSwitch(
+				properties.getProperty("Global.MasterSwitch.ID"),
+				Integer.valueOf(properties.getProperty("Global.MasterSwitch.GPIO")));
 
 		temperatureHumiditySensor = new TemperatureHumiditySensor(
 				properties.getProperty("Global.TemperatureHumiditySensor.ID"),
@@ -113,6 +121,19 @@ public class Greenhouse {
 		}
 
 		zoneController = new ZoneController(zones);
+		
+		masterSwitch.on(new GPIOTaskListener() {
+			
+			@Override
+			public void onTaskStarted() {
+				System.out.println("Turning master switch on...");
+			}
+			
+			@Override
+			public void onTaskCompleted() {
+				System.out.println("Master switch turned on.");
+			}
+		});
 	}
 
 	private void startTimedServices() {
@@ -157,6 +178,10 @@ public class Greenhouse {
 
 	public ZoneController getZoneController() {
 		return zoneController;
+	}
+	
+	public MasterSwitch getMasterSwitch() {
+		return masterSwitch;
 	}
 
 	public GreenhouseGpioController getGreenhouseGpioController() {

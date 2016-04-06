@@ -16,7 +16,8 @@ import ca.tylerwest.greenhouse.web.GreenhouseUI;
 @SuppressWarnings("serial")
 public class GlobalComponent extends CustomComponent {
 	
-	private Label windowStateLabel;
+	private Label windowStateLabel = new Label();
+	private Label masterSwitchStateLabel = new Label();
 
 	public GlobalComponent() {
 		createComponent();
@@ -29,10 +30,51 @@ public class GlobalComponent extends CustomComponent {
 		layout.setMargin(true);
 		panel.setContent(layout);
 		
+		layout.addComponent(createMasterSwitchPanel());
 		layout.addComponent(createTemperatureHumidityPanel());
 		layout.addComponent(createWindowMotorPanel());
 		
 		setCompositionRoot(panel);
+	}
+	
+	private Panel createMasterSwitchPanel()
+	{
+		Panel result = new Panel("Master Switch");
+		
+		VerticalLayout panelContent = new VerticalLayout();
+		panelContent.setMargin(true);
+		result.setContent(panelContent);
+		
+		panelContent.addComponent(masterSwitchStateLabel);
+		updateStateLabels();
+		
+		if (GreenhouseUI.get().getAccessControl().isUserSignedIn())
+		{
+			Button masterSwitchOnButton = new Button("On", new Button.ClickListener() {
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Greenhouse.getInstance().getMasterSwitch().on(new StateListener());
+				}
+			});
+			
+			Button masterSwitchOffButton = new Button("Off", new Button.ClickListener() {
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Greenhouse.getInstance().getMasterSwitch().off(new StateListener());
+				}
+			});
+			
+			HorizontalLayout buttonLayout = new HorizontalLayout();
+			buttonLayout.setMargin(true);
+			panelContent.addComponent(buttonLayout);
+			
+			buttonLayout.addComponent(masterSwitchOnButton);
+			buttonLayout.addComponent(masterSwitchOffButton);
+		}
+		
+		return result;
 	}
 	
 	private Panel createTemperatureHumidityPanel()
@@ -64,9 +106,8 @@ public class GlobalComponent extends CustomComponent {
 		panelContent.setMargin(true);
 		result.setContent(panelContent);
 		
-		windowStateLabel = new Label();
 		panelContent.addComponent(windowStateLabel);
-		updateStateLabel();
+		updateStateLabels();
 		
 		if (GreenhouseUI.get().getAccessControl().isUserSignedIn())
 		{
@@ -74,7 +115,7 @@ public class GlobalComponent extends CustomComponent {
 				
 				@Override
 				public void buttonClick(ClickEvent event) {
-					Greenhouse.getInstance().getWindowController().raiseWindows(new WindowStateListener());
+					Greenhouse.getInstance().getWindowController().raiseWindows(new StateListener());
 				}
 			});
 			
@@ -82,7 +123,7 @@ public class GlobalComponent extends CustomComponent {
 				
 				@Override
 				public void buttonClick(ClickEvent event) {
-					Greenhouse.getInstance().getWindowController().lowerWindows(new WindowStateListener());
+					Greenhouse.getInstance().getWindowController().lowerWindows(new StateListener());
 				}
 			});
 			
@@ -97,22 +138,23 @@ public class GlobalComponent extends CustomComponent {
 		return result;
 	}
 	
-	private void updateStateLabel()
+	private void updateStateLabels()
 	{
 		windowStateLabel.setValue(String.format("Window state: %s", Greenhouse.getInstance().getWindowController().getState()));
+		masterSwitchStateLabel.setValue(String.format("Master Switch state: %s", Greenhouse.getInstance().getMasterSwitch().getState()));
 	}
 	
-	private class WindowStateListener implements GPIOTaskListener
+	private class StateListener implements GPIOTaskListener
 	{
 
 		@Override
 		public void onTaskStarted() {
-			updateStateLabel();
+			updateStateLabels();
 		}
 
 		@Override
 		public void onTaskCompleted() {
-			updateStateLabel();
+			updateStateLabels();
 		}
 	}
 }
