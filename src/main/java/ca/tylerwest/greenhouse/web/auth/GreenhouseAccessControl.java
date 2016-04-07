@@ -1,5 +1,6 @@
 package ca.tylerwest.greenhouse.web.auth;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -17,9 +18,11 @@ public class GreenhouseAccessControl implements AccessControl {
 	private Authentication auth;
 
 	public GreenhouseAccessControl() {
-		try {
-			load(getClass().getClassLoader().getResourceAsStream("auth.xml"));
+		try (InputStream stream = ClassLoader.getSystemResourceAsStream("auth.xml")) {
+			load(stream);
 		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

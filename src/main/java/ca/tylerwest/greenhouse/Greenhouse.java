@@ -1,6 +1,7 @@
 package ca.tylerwest.greenhouse;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -31,7 +32,7 @@ public class Greenhouse {
 	private WindowController windowController;
 	private ZoneController zoneController;
 	private GreenhouseGpioController greenhouseGpioController;
-	
+
 	private MasterSwitch masterSwitch;
 
 	private Greenhouse() {
@@ -51,8 +52,8 @@ public class Greenhouse {
 
 	private void loadProperties() {
 		properties = new Properties();
-		try {
-			properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
+		try (InputStream stream = ClassLoader.getSystemResourceAsStream("config.properties")) {
+			properties.load(stream);
 		} catch (IOException ex) {
 			Logger.getLogger(Greenhouse.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -60,9 +61,8 @@ public class Greenhouse {
 
 	private void createComponents() {
 		greenhouseGpioController = new GreenhouseGpioController();
-		
-		masterSwitch = new MasterSwitch(
-				properties.getProperty("Global.MasterSwitch.ID"),
+
+		masterSwitch = new MasterSwitch(properties.getProperty("Global.MasterSwitch.ID"),
 				Integer.valueOf(properties.getProperty("Global.MasterSwitch.GPIO")));
 
 		temperatureHumiditySensor = new TemperatureHumiditySensor(
@@ -74,10 +74,10 @@ public class Greenhouse {
 		int windowMotorNumber = 1;
 		String windowMotorID = properties.getProperty(String.format("Global.WindowMotor%s.ID", windowMotorNumber));
 		while (windowMotorID != null) {
-			Integer forwardGpio = Integer
-					.valueOf(properties.getProperty(String.format("Global.WindowMotor%s.Forward.GPIO", windowMotorNumber)));
-			Integer backwardGpio = Integer
-					.valueOf(properties.getProperty(String.format("Global.WindowMotor%s.Backward.GPIO", windowMotorNumber)));
+			Integer forwardGpio = Integer.valueOf(
+					properties.getProperty(String.format("Global.WindowMotor%s.Forward.GPIO", windowMotorNumber)));
+			Integer backwardGpio = Integer.valueOf(
+					properties.getProperty(String.format("Global.WindowMotor%s.Backward.GPIO", windowMotorNumber)));
 			WindowMotor motor = new WindowMotor(windowMotorID, forwardGpio, backwardGpio);
 			windowMotors.add(motor);
 
@@ -121,14 +121,14 @@ public class Greenhouse {
 		}
 
 		zoneController = new ZoneController(zones);
-		
+
 		masterSwitch.on(new GPIOTaskListener() {
-			
+
 			@Override
 			public void onTaskStarted() {
 				System.out.println("Turning master switch on...");
 			}
-			
+
 			@Override
 			public void onTaskCompleted() {
 				System.out.println("Master switch turned on.");
@@ -179,7 +179,7 @@ public class Greenhouse {
 	public ZoneController getZoneController() {
 		return zoneController;
 	}
-	
+
 	public MasterSwitch getMasterSwitch() {
 		return masterSwitch;
 	}
