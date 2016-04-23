@@ -18,7 +18,7 @@ public class GreenhouseAccessControl implements AccessControl {
 	private Authentication auth;
 
 	public GreenhouseAccessControl() {
-		try (InputStream stream = ClassLoader.getSystemResourceAsStream("auth.xml")) {
+		try (InputStream stream = getClass().getClassLoader().getResourceAsStream("auth.xml")) {
 			load(stream);
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -38,7 +38,7 @@ public class GreenhouseAccessControl implements AccessControl {
         if (username == null || username.isEmpty())
             return false;
         
-        Optional<User> result = auth.getUsers().stream().filter(u -> u.getName().equals(username) && u.getPassword().equals(password)).findFirst();
+        Optional<User> result = auth.getUsers().stream().filter(u -> u.getName().equalsIgnoreCase(username) && u.getPassword().equals(password)).findFirst();
         if (result.isPresent())
         {
         	CurrentUser.set(result.get());

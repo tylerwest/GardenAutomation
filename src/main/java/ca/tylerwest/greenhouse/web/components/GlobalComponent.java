@@ -127,12 +127,36 @@ public class GlobalComponent extends CustomComponent {
 				}
 			});
 			
+			Button nudgeUpWindowsButton = new Button("Nudge Windows Up", new Button.ClickListener() {
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Greenhouse.getInstance().getWindowController().nudgeUp(new StateListener());
+				}
+			});
+			
+			Button nudgeDownWindowsButton = new Button("Nudge Windows Down", new Button.ClickListener() {
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Greenhouse.getInstance().getWindowController().nudgeDown(new StateListener());
+				}
+			});
+			
 			HorizontalLayout buttonLayout = new HorizontalLayout();
 			buttonLayout.setMargin(true);
 			panelContent.addComponent(buttonLayout);
 			
 			buttonLayout.addComponent(raiseWindowsButton);
 			buttonLayout.addComponent(lowerWindowsButton);
+			
+			HorizontalLayout nudgeButtonLayout = new HorizontalLayout();
+			nudgeButtonLayout.setMargin(true);
+			panelContent.addComponent(nudgeButtonLayout);
+			
+			nudgeButtonLayout.addComponent(nudgeUpWindowsButton);
+			nudgeButtonLayout.addComponent(nudgeDownWindowsButton);
+			
 		}
 		
 		return result;

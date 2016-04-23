@@ -37,6 +37,20 @@ public class WindowController {
 	public void setActiveTimeSeconds(double activeTimeSeconds) {
 		this.activeTimeSeconds = activeTimeSeconds;
 	}
+	
+	public void nudgeUp(GPIOTaskListener listener) {
+		double oldActiveTimeSeconds = getActiveTimeSeconds();
+		setActiveTimeSeconds(0.5);
+		raiseWindows(listener);
+		setActiveTimeSeconds(oldActiveTimeSeconds);
+	}
+	
+	public void nudgeDown(GPIOTaskListener listener) {
+		double oldActiveTimeSeconds = getActiveTimeSeconds();
+		setActiveTimeSeconds(0.5);
+		lowerWindows(listener);
+		setActiveTimeSeconds(oldActiveTimeSeconds);
+	}
 
 	public void raiseWindows(GPIOTaskListener listener) {
 		state = State.OPENING;

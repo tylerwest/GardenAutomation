@@ -52,7 +52,7 @@ public class Greenhouse {
 
 	private void loadProperties() {
 		properties = new Properties();
-		try (InputStream stream = ClassLoader.getSystemResourceAsStream("config.properties")) {
+		try (InputStream stream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
 			properties.load(stream);
 		} catch (IOException ex) {
 			Logger.getLogger(Greenhouse.class.getName()).log(Level.SEVERE, null, ex);
