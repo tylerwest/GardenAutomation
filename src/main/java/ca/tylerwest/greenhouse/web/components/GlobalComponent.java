@@ -18,6 +18,7 @@ public class GlobalComponent extends CustomComponent {
 	
 	private Label windowStateLabel = new Label();
 	private Label masterSwitchStateLabel = new Label();
+	private Label systemControlStateLabel = new Label();
 
 	public GlobalComponent() {
 		createComponent();
@@ -30,11 +31,54 @@ public class GlobalComponent extends CustomComponent {
 		layout.setMargin(true);
 		panel.setContent(layout);
 		
+		layout.addComponent(createSystemControlPanel());
 		layout.addComponent(createMasterSwitchPanel());
 		layout.addComponent(createTemperatureHumidityPanel());
 		layout.addComponent(createWindowMotorPanel());
 		
 		setCompositionRoot(panel);
+	}
+	
+	private Panel createSystemControlPanel()
+	{
+		Panel result = new Panel("System Control");
+		
+		VerticalLayout panelContent = new VerticalLayout();
+		panelContent.setMargin(true);
+		result.setContent(panelContent);
+		
+		panelContent.addComponent(systemControlStateLabel);
+		updateStateLabels();
+		
+		if (GreenhouseUI.get().getAccessControl().isUserSignedIn())
+		{
+			Button powerOffButton = new Button("Shutdown", new Button.ClickListener() {
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Greenhouse.getInstance().getSystemController().powerOff();
+					updateStateLabels();
+				}
+			});
+			
+			Button rebootButton = new Button("Reboot", new Button.ClickListener() {
+				
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Greenhouse.getInstance().getSystemController().reboot();
+					updateStateLabels();
+				}
+			});
+			
+			HorizontalLayout buttonLayout = new HorizontalLayout();
+			buttonLayout.setMargin(true);
+			panelContent.addComponent(buttonLayout);
+			
+			buttonLayout.addComponent(powerOffButton);
+			buttonLayout.addComponent(rebootButton);
+		}
+		
+		return result;
 	}
 	
 	private Panel createMasterSwitchPanel()
@@ -166,6 +210,7 @@ public class GlobalComponent extends CustomComponent {
 	{
 		windowStateLabel.setValue(String.format("Window state: %s", Greenhouse.getInstance().getWindowController().getState()));
 		masterSwitchStateLabel.setValue(String.format("Master Switch state: %s", Greenhouse.getInstance().getMasterSwitch().getState()));
+		systemControlStateLabel.setValue(String.format("System state: %s", Greenhouse.getInstance().getSystemController().getState()));
 	}
 	
 	private class StateListener implements GPIOTaskListener

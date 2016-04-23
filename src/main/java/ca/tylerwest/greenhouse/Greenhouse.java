@@ -14,6 +14,7 @@ import ca.tylerwest.greenhouse.components.SolenoidValve;
 import ca.tylerwest.greenhouse.components.TemperatureHumiditySensor;
 import ca.tylerwest.greenhouse.components.WindowMotor;
 import ca.tylerwest.greenhouse.controllers.GreenhouseGpioController;
+import ca.tylerwest.greenhouse.controllers.SystemController;
 import ca.tylerwest.greenhouse.controllers.WindowController;
 import ca.tylerwest.greenhouse.controllers.Zone;
 import ca.tylerwest.greenhouse.controllers.ZoneController;
@@ -32,6 +33,7 @@ public class Greenhouse {
 	private WindowController windowController;
 	private ZoneController zoneController;
 	private GreenhouseGpioController greenhouseGpioController;
+	private SystemController systemController;
 
 	private MasterSwitch masterSwitch;
 
@@ -60,6 +62,7 @@ public class Greenhouse {
 	}
 
 	private void createComponents() {
+		systemController = new SystemController();
 		greenhouseGpioController = new GreenhouseGpioController();
 
 		masterSwitch = new MasterSwitch(properties.getProperty("Global.MasterSwitch.ID"),
@@ -186,6 +189,10 @@ public class Greenhouse {
 
 	public GreenhouseGpioController getGreenhouseGpioController() {
 		return greenhouseGpioController;
+	}
+	
+	public SystemController getSystemController() {
+		return systemController;
 	}
 
 	public Properties getProperties() {
