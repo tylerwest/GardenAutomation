@@ -26,7 +26,7 @@ public class WindowController {
 
 	public WindowController(List<WindowMotor> windowMotors) {
 		this.windowMotors = windowMotors;
-		executor = Executors.newCachedThreadPool();
+		executor = Executors.newSingleThreadExecutor();
 		Greenhouse.getInstance().addTerminationListener(new WindowControllerTerminationListener());
 	}
 	
@@ -39,94 +39,135 @@ public class WindowController {
 	}
 	
 	public void nudgeUp(GPIOTaskListener listener) {
-		double oldActiveTimeSeconds = getActiveTimeSeconds();
-		setActiveTimeSeconds(0.5);
-		raiseWindows(listener);
-		setActiveTimeSeconds(oldActiveTimeSeconds);
+		raiseWindows(0.5, listener);
 	}
 	
 	public void nudgeDown(GPIOTaskListener listener) {
-		double oldActiveTimeSeconds = getActiveTimeSeconds();
-		setActiveTimeSeconds(0.5);
-		lowerWindows(listener);
-		setActiveTimeSeconds(oldActiveTimeSeconds);
+		lowerWindows(0.5, listener);
+	}
+	
+	public void raiseWindows(GPIOTaskListener listener)
+	{
+		raiseWindows(getActiveTimeSeconds(), listener);
+	}
+	
+	public void lowerWindows(GPIOTaskListener listener)
+	{
+		lowerWindows(getActiveTimeSeconds(), listener);
 	}
 
-	public void raiseWindows(GPIOTaskListener listener) {
-		state = State.OPENING;
-		listener.onTaskStarted();
-
-		List<Callable<Object>> todo = new ArrayList<Callable<Object>>();
-		for (WindowMotor motor : windowMotors) {
-			todo.add(Executors.callable(new MotorForwardTask(motor)));
-		}
-		
-		try {
-			executor.invokeAll(todo);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		state = State.OPEN;
-		listener.onTaskCompleted();
+	private void raiseWindows(double activeTime, GPIOTaskListener listener) {
+		executor.submit(new RaiseWindowsTask(activeTime, listener));
 	}
 
-	public void lowerWindows(GPIOTaskListener listener) {
-		state = State.CLOSING;
-		listener.onTaskStarted();
-
-		List<Callable<Object>> todo = new ArrayList<Callable<Object>>();
-		for (WindowMotor motor : windowMotors) {
-			todo.add(Executors.callable(new MotorBackwardTask(motor)));
-		}
-		
-		try {
-			executor.invokeAll(todo);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		state = State.CLOSED;
-		listener.onTaskCompleted();
+	private void lowerWindows(double activeTime, GPIOTaskListener listener) {
+		executor.submit(new LowerWindowsTask(activeTime, listener));
 	}
 
 	public State getState() {
 		return state;
 	}
 	
-	private class MotorForwardTask implements Runnable
+	private abstract class WindowControllerTask implements Runnable
 	{
-		private WindowMotor motor;
+		protected GPIOTaskListener listener;
+		protected double activeTime;
 		
-		public MotorForwardTask(WindowMotor motor) {
-			this.motor = motor;
+		public WindowControllerTask(double activeTime, GPIOTaskListener listener) {
+			this.activeTime = activeTime;
+			this.listener = listener;
 		}
 		
 		@Override
-		public void run() {
+		public final void run() {
+			begin();
+			listener.onTaskStarted();
+			
+			ExecutorService service = Executors.newCachedThreadPool();
+			
+			List<Callable<Object>> todo = new ArrayList<Callable<Object>>();
+			for (WindowMotor motor : windowMotors) {
+				todo.add(Executors.callable(createTaskForMotor(motor, activeTime)));
+			}
+			
 			try {
-				motor.on(Direction.FORWARD);
-				Thread.sleep((long) (getActiveTimeSeconds() * 1000));
-				motor.off();
+				service.invokeAll(todo);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			
+			service.shutdown();
+			
+			end();
+			listener.onTaskCompleted();
+		}
+		
+		protected abstract void begin();
+		protected abstract void end();
+		protected abstract Runnable createTaskForMotor(WindowMotor motor, double activeTime);
+	}
+	
+	private class RaiseWindowsTask extends WindowControllerTask
+	{
+		public RaiseWindowsTask(double activeTime, GPIOTaskListener listener) {
+			super(activeTime, listener);
+		}
+		
+		@Override
+		protected void begin() {
+			state = State.OPENING;
+		}
+		
+		@Override
+		protected Runnable createTaskForMotor(WindowMotor motor, double activeTime) {
+			return new MotorTask(motor, activeTime, Direction.FORWARD);
+		}
+		
+		@Override
+		protected void end() {
+			state = State.OPEN;
 		}
 	}
 	
-	private class MotorBackwardTask implements Runnable
+	private class LowerWindowsTask extends WindowControllerTask
+	{
+		public LowerWindowsTask(double activeTime, GPIOTaskListener listener) {
+			super(activeTime, listener);
+		}
+		
+		@Override
+		protected void begin() {
+			state = State.CLOSING;
+		}
+		
+		@Override
+		protected Runnable createTaskForMotor(WindowMotor motor, double activeTime) {
+			return new MotorTask(motor, activeTime, Direction.BACKWARD);
+		}
+		
+		@Override
+		protected void end() {
+			state = State.CLOSED;
+		}
+	}
+	
+	private class MotorTask implements Runnable
 	{
 		private WindowMotor motor;
+		private double activeTime;
+		private Direction direction;
 		
-		public MotorBackwardTask(WindowMotor motor) {
+		public MotorTask(WindowMotor motor, double activeTime, Direction direction) {
 			this.motor = motor;
+			this.activeTime = activeTime;
+			this.direction = direction;
 		}
 		
 		@Override
 		public void run() {
 			try {
-				motor.on(Direction.BACKWARD);
-				Thread.sleep((long) (getActiveTimeSeconds() * 1000));
+				motor.on(direction);
+				Thread.sleep((long) (activeTime * 1000));
 				motor.off();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
