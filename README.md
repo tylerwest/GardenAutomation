@@ -1,4 +1,4 @@
-# Greenhose
+# Greenhouse
 
 ## Introduction
 This project is being developed to fully automate my backyard greenhouse. Basic functions include monitoring soil moisture content, monitoring the ambient temperature and humidity inside the greenhouse, regulating the flow of water into the soil, and opening and closing the windows.
